@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Clever | Portal</title>
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/sel-lers/x@main/style.css"/>
+
+    <style>
+        /* 1. RESET & THEME */
+        body, html {
+            margin: 0 !important;
+            padding: 0 !important;
+            background-color: #000000 !important;
+            overflow: hidden !important;
+            width: 100%;
+            height: 100%;
+            font-family: Arial, sans-serif;
+        }
+
+        /* 2. THE TOP BAR - FORCED PURE WHITE */
+        #topbar {
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 100% !important;
+            height: 60px !important;
+            background-color: #ffffff !important;
+            background: #ffffff !important;
+            display: flex !important;
+            align-items: center !important;
+            padding: 0 15px !important;
+            z-index: 1000000 !important;
+            box-sizing: border-box !important;
+            border: none !important;
+        }
+
+        #topbar img {
+            height: 40px !important;
+            margin-right: 12px !important;
+        }
+
+        #topbar a {
+            color: #000000 !important;
+            text-decoration: none !important;
+            font-size: 20px !important;
+            font-weight: 500 !important;
+        }
+
+        /* 3. GAME AREA SETUP */
+        #unity-container {
+            position: absolute !important;
+            top: 60px !important;
+            left: 0 !important;
+            width: 100% !important;
+            height: calc(100% - 60px) !important;
+            background: #000 !important;
+        }
+
+        #unity-canvas {
+            width: 100% !important;
+            height: 100% !important;
+            outline: none;
+            display: block;
+        }
+
+        #loading-cover {
+            position: absolute !important;
+            top: 60px !important;
+            width: 100% !important;
+            height: calc(100% - 60px) !important;
+            z-index: 10;
+        }
+
+        canvas:focus { outline: none; }
+    </style>
+</head>
+
+<body class="dark">
+
+    <div id="topbar">
+        <img src="https://lh3.googleusercontent.com/a-/ALV-UjWQneu0wwz9oqOIrJuC-rEk16wbmHPB_n6DEY2AUPRoiQYTQZs=s240-p-k-rw-no" alt="Logo">
+        <a href="https://sites.google.com/view/bobsgwebsite/home">Clever | Portal</a>
+    </div>
+
+    <div id="unity-container" class="unity-desktop">
+        <canvas id="unity-canvas" tabindex="-1"></canvas>
+    </div>
+
+    <div id="loading-cover" style="display:none;">
+        <div id="unity-loading-bar">
+            <div id="unity-logo"><img src="https://cdn.jsdelivr.net/gh/sel-lers/x@main/logo.png"/></div>
+            <div id="unity-progress-bar-empty" style="display: none;">
+                <div id="unity-progress-bar-full"></div>
+            </div>
+            <div class="spinner"></div>
+        </div>
+    </div>
+
+    <script>
+        const buildUrl = "https://cdn.jsdelivr.net/gh/sel-lers/x@main/Build";
+        const loaderUrl = buildUrl + "/Web GL.loader.js";
+        const config = {
+            dataUrl: buildUrl + "/Web GL.data.unityweb",
+            frameworkUrl: buildUrl + "/Web GL.framework.js.unityweb",
+            codeUrl: buildUrl + "/Web GL.wasm.unityweb",
+            streamingAssetsUrl: "StreamingAssets",
+            companyName: "FoXSkr",
+            productName: "Contra",
+            productVersion: "1.9.4"
+        };
+
+        const canvas = document.querySelector("#unity-canvas");
+        const loadingCover = document.querySelector("#loading-cover");
+        const progressBarFull = document.querySelector("#unity-progress-bar-full");
+        const spinner = document.querySelector('.spinner');
+
+        // 4. 360-SPIN / POINTER LOCK FIX
+        canvas.addEventListener("mousedown", () => {
+            canvas.requestPointerLock = canvas.requestPointerLock || canvas.mozRequestPointerLock;
+            canvas.requestPointerLock();
+        });
+
+        loadingCover.style.background = "url('https://cdn.jsdelivr.net/gh/sel-lers/x@main/background.jpg') center / cover";
+        loadingCover.style.display = "";
+
+        // Start Unity
+        const script = document.createElement("script");
+        script.src = loaderUrl;
+        script.onload = () => {
+            createUnityInstance(canvas, config, (progress) => {
+                spinner.style.display = "none";
+                document.querySelector("#unity-progress-bar-empty").style.display = "";
+                progressBarFull.style.width = `${100 * progress}%`;
+            }).then((unityInstance) => {
+                loadingCover.style.display = "none";
+            });
+        };
+        document.body.appendChild(script);
+
+        document.addEventListener('contextmenu', event => event.preventDefault());
+    </script>
+</body>
+</html>
